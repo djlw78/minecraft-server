@@ -22,14 +22,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := startServer(*filename); err != nil {
+	if err := startServer(*filename, flag.Args()); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func startServer(filename string) error {
+func startServer(filename string, args []string) error {
 	name := "java"
-	args := []string{"-Xms1G", "-Xmx1G", "-server", "-jar", filename, "nogui"}
+	args = append(args, "-server", "-jar", filename, "nogui")
 	cmd := exec.Command(name, args...)
 
 	in, err := cmd.StdinPipe()
