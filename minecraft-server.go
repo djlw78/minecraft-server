@@ -14,21 +14,22 @@ import (
 )
 
 func main() {
+	filename := flag.String("filename", "server.jar", "Filename to use for the server.")
 	version := flag.String("version", "release", "Minecraft version to use. Must be 'release' (default), 'snapshot', or a specific version string.")
 	flag.Parse()
 
-	if err := getVersion(*version); err != nil {
+	if err := getVersion(*version, *filename); err != nil {
 		log.Fatal(err)
 	}
 
-	/*if err := startServer(); err != nil {
+	if err := startServer(*filename); err != nil {
 		log.Fatal(err)
-	}*/
+	}
 }
 
-func startServer() error {
+func startServer(filename string) error {
 	name := "java"
-	args := []string{"-Xms1G", "-Xmx1G", "-server", "-jar", "minecraft_server.jar", "nogui"}
+	args := []string{"-Xms1G", "-Xmx1G", "-server", "-jar", filename, "nogui"}
 	cmd := exec.Command(name, args...)
 
 	in, err := cmd.StdinPipe()
@@ -64,14 +65,12 @@ func startServer() error {
 	return nil
 }
 
-type latest struct {
-	Release  string
-	Snapshot string
-}
-
-func getVersion(id string) error {
+func getVersion(id string, filename string) error {
 	type versionManifest struct {
-		Latest   latest
+		Latest struct {
+			Release  string
+			Snapshot string
+		}
 		Versions []struct {
 			ID  string
 			URL string
@@ -105,7 +104,7 @@ func getVersion(id string) error {
 				return err
 			}
 
-			file, err := os.Create("server.jar")
+			file, err := os.Create(filename)
 			if err != nil {
 				return err
 			}
