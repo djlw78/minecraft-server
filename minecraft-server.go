@@ -16,10 +16,13 @@ import (
 func main() {
 	filename := flag.String("filename", "server.jar", "Filename to use for the server.")
 	version := flag.String("version", "release", "Minecraft version to use. Must be 'release' (default), 'snapshot', or a specific version string.")
+	doVersionCheck := flag.Bool("do-version-check", true, "Enables version checking.")
 	flag.Parse()
 
-	if err := getVersion(*version, *filename); err != nil {
-		log.Fatal(err)
+	if *doVersionCheck {
+		if err := getVersion(*version, *filename); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	if err := startServer(*filename, flag.Args()); err != nil {
